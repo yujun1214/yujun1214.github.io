@@ -11,8 +11,8 @@ github_repo: "git@github.com:yujun1214/yujun1214.github.io.git" # you code repos
 
 # Sidebar settings
 sidebar: true                           # whether or not using Sidebar.
-sidebar-about-description: "Goals determine what you going to be!"
-sidebar-avatar: /img/about-BY-gentle.jpg      # use absolute URL, seeing it's used in both `/` and `/about/`
+sidebar-about-description: "In God We Trust"
+sidebar-avatar: /img/post-bg-hacker.jpg      # use absolute URL, seeing it's used in both `/` and `/about/`
 
 
 
@@ -61,9 +61,9 @@ kramdown:
 
 # Gitalk
 gitalk:
-  enable: false    #是否开启Gitalk评论
-  clientID: f2c84e7629bb1446c1a4                            #生成的clientID
-  clientSecret: ca6d6139d1e1b8c43f8b2e19492ddcac8b322d0d    #生成的clientSecret
+  enable: true    #是否开启Gitalk评论
+  clientID: bb9e8a6ad2f963092a82                            #生成的clientID
+  clientSecret: 36dc06a4efcd5b00b0f61f7851d115c8aa095768    #生成的clientSecret
   repo: yujun1214.github.io    #仓库名称
   owner: yujun1214    #github用户名
   admin: yujun1214
@@ -99,6 +99,9 @@ service-worker: true
 # Friends
 friends: [
     {
+        title: "Yujun's Blog",
+        href: "https://yujun1214.github.io/"
+    },{
         title: "Apple",
         href: "https://apple.com"
     },{
