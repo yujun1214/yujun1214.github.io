@@ -1,7 +1,7 @@
 ---
 layout:     post
-title:      基于python的期权交易系统-行情GateWay
-subtitle:   借鉴CTP接口的行情GateWay设计
+title:      基于python的期权交易系统-行情Gateway
+subtitle:   借鉴CTP接口的行情Gateway设计
 date:       2022-05-08
 author:     YuJun
 header-img: img/post-bg-options-insights.webp
@@ -27,13 +27,13 @@ class CHessMdApi(QObject):
     """行情api接口基类"""
     def __init__(self):
         super().__init__()
-        self._spi: CHessMdSpi = None    # 行情spi类
-        self._SubscribedSecues = []     # 已订阅的合约代码列表
-        self._brokerid: str = ''        # 经纪公司代码
-        self._userid: str = ''          # 用户代码
+        self._spi: CHessMdSpi = None    # 行情spi类 #
+        self._SubscribedSecues = []     # 已订阅的合约代码列表 #
+        self._brokerid: str = ''        # 经纪公司代码 #
+        self._userid: str = ''          # 用户代码 #
 
     def Init(self):
-        """
+        """\
         初始化运行环境，只有调用后接口才开始工作
         """
         pass
@@ -90,7 +90,7 @@ from PySide2.QtCore import Signal
 class CHessMdSpi(QObject):
     """行情spi回调接口基类"""
 
-    # 定义信号
+    # 定义信号 #
     sigOnRspUserLogin = Signal(CHessRspUserLoginField, CHessRspInfoField, int, bool)
     sigOnRtnDepthMarketDatas = Signal(pd.DataFrame)
     sigOnRtnMarketData = Signal()
@@ -100,7 +100,7 @@ class CHessMdSpi(QObject):
         初始化spi接口
         """
         super().__init__()
-        self._isLogin = False   # 是否登录成功
+        self._isLogin = False   # 是否登录成功 #
 
     def HessOnRspUserLogin(self, rspUserLoginInfo: CHessRspUserLoginField, rspInfo: CHessRspInfoField, nRequestID: int,
                            bIsLast: bool):
@@ -147,8 +147,8 @@ class CSinaMDApi(CHessMdApi):
 
     def __init__(self):
         super().__init__()
-        self._SubscribedCodesString = ''  # 已订阅合约代码的连接字符串
-        self._value_lock = threading.Lock()  # 互斥锁
+        self._SubscribedCodesString = ''  # 已订阅合约代码的连接字符串 #
+        self._value_lock = threading.Lock()  # 互斥锁 #
         self.timer = QTimer(self)
 
     @classmethod
@@ -298,10 +298,10 @@ class CSinaStockMdApi(CSinaMDApi):
             with self._value_lock:
                 url = "https://hq.sinajs.cn/list={code_str}".format(code_str=self._SubscribedCodesString)
             data = get(url, headers=SinaApiConst.HQ_REQUEST_HEADERS).content.decode('gbk')
-            # 解析返回数据中的股票代码
+            # 解析返回数据中的股票代码 #
             str_code_pattern = re.compile(r'hq_str_(.*?)=')
             stock_codes = str_code_pattern.findall(data)
-            # 解析返回数据中的行情数据
+            # 解析返回数据中的行情数据 #
             str_mkt_pattern = re.compile(r'=\"(.*?)\";')
             mkt_datas = str_mkt_pattern.findall(data)
             stock_mkt_datas = [[Utils.Symbol2MktCode(code)] + mkt_data.rstrip(',').split(',') for code,
@@ -352,10 +352,10 @@ class CSinaIdxFutureMdApi(CSinaMDApi):
             with self._value_lock:
                 url = "https://hq.sinajs.cn/list={code_str}".format(code_str=self._SubscribedCodesString)
             data = get(url, headers=SinaApiConst.HQ_REQUEST_HEADERS).content.decode("gbk")
-            # 解析返回数据中的期指代码
+            # 解析返回数据中的期指代码 #
             str_code_pattern = re.compile(r"CFF_RE_(.*?)=")
             idxFt_codes = str_code_pattern.findall(data)
-            # 解析返回数据中的行情数据
+            # 解析返回数据中的行情数据 #
             str_mkt_pattern = re.compile(r'=\"(.*?)\";')
             mkt_datas = str_mkt_pattern.findall(data)
             idxFt_mkt_datas = [[Utils.Symbol2MktCode(code)] + mkt_data.split(',')
@@ -422,10 +422,10 @@ class CSinaStockOptionMdApi(CSinaMDApi):
         with self._value_lock:
             url = "https://hq.sinajs.cn/list={code_str}".format(code_str=self._SubscribedCodesString.replace("OP", "SO"))
         data = get(url, headers=SinaApiConst.HQ_REQUEST_HEADERS).content.decode("gbk")
-        # 解析返回数据中的期权代码
+        # 解析返回数据中的期权代码 #
         str_code_pattern = re.compile(r'SO_(.*?)=')
         opt_codes = str_code_pattern.findall(data)
-        # 解析返回数据中的希腊字母、隐波数据
+        # 解析返回数据中的希腊字母、隐波数据 #
         str_greek_pattern = re.compile(r'=\"(.*?)\";')
         greek_datas = str_greek_pattern.findall(data)
         opt_greek_datas = [[Utils.Symbol2MktCode(code)] + greek_data.replace(",,,,", ",").split(",")[: -1]
@@ -448,10 +448,10 @@ class CSinaStockOptionMdApi(CSinaMDApi):
             with self._value_lock:
                 url = "https://hq.sinajs.cn/list={code_str}".format(code_str=self._SubscribedCodesString)
             data = get(url, headers=SinaApiConst.HQ_REQUEST_HEADERS).content.decode('gbk')
-            # 解析返回数据中的期权代码
+            # 解析返回数据中的期权代码 #
             str_code_pattern = re.compile(r'OP_(.*?)=')
             opt_codes = str_code_pattern.findall(data)
-            # 解析返回数据中的行情数据
+            # 解析返回数据中的行情数据 #
             str_mkt_pattern = re.compile(r'=\"(.*?)\";')
             mkt_datas = str_mkt_pattern.findall(data)
             opt_mkt_datas = [[Utils.Symbol2MktCode(code)] + mkt_data.split(',')
