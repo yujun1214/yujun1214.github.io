@@ -20,6 +20,7 @@ tags:
 和CTP一样，我们把行情Gateway设计成“调用类(api)”和“回调类(spi)”两个组成部分。api完成登录、登出、订阅、退订等任务，spi处理回调。
 
 话不多说，直接上代码。下面是api的接口：
+
 ```python
 from PySide2.QtCore import QObject
 
@@ -27,13 +28,13 @@ class CHessMdApi(QObject):
     """行情api接口基类"""
     def __init__(self):
         super().__init__()
-        self._spi: CHessMdSpi = None    # 行情spi类 #
-        self._SubscribedSecues = []     # 已订阅的合约代码列表 #
-        self._brokerid: str = ''        # 经纪公司代码 #
-        self._userid: str = ''          # 用户代码 #
+        self._spi: CHessMdSpi = None    # 行情spi类
+        self._SubscribedSecues = []     # 已订阅的合约代码列表
+        self._brokerid: str = ''        # 经纪公司代码
+        self._userid: str = ''          # 用户代码
 
     def Init(self):
-        """\
+        """
         初始化运行环境，只有调用后接口才开始工作
         """
         pass
@@ -83,6 +84,7 @@ class CHessMdApi(QObject):
 ```
 
 下面是spi的接口：
+
 ```python
 import pandas as pd
 from PySide2.QtCore import Signal
@@ -90,7 +92,7 @@ from PySide2.QtCore import Signal
 class CHessMdSpi(QObject):
     """行情spi回调接口基类"""
 
-    # 定义信号 #
+    # 定义信号
     sigOnRspUserLogin = Signal(CHessRspUserLoginField, CHessRspInfoField, int, bool)
     sigOnRtnDepthMarketDatas = Signal(pd.DataFrame)
     sigOnRtnMarketData = Signal()
@@ -100,7 +102,7 @@ class CHessMdSpi(QObject):
         初始化spi接口
         """
         super().__init__()
-        self._isLogin = False   # 是否登录成功 #
+        self._isLogin = False   # 是否登录成功
 
     def HessOnRspUserLogin(self, rspUserLoginInfo: CHessRspUserLoginField, rspInfo: CHessRspInfoField, nRequestID: int,
                            bIsLast: bool):
@@ -147,8 +149,8 @@ class CSinaMDApi(CHessMdApi):
 
     def __init__(self):
         super().__init__()
-        self._SubscribedCodesString = ''  # 已订阅合约代码的连接字符串 #
-        self._value_lock = threading.Lock()  # 互斥锁 #
+        self._SubscribedCodesString = ''  # 已订阅合约代码的连接字符串
+        self._value_lock = threading.Lock()  # 互斥锁
         self.timer = QTimer(self)
 
     @classmethod
@@ -261,6 +263,7 @@ class CSinaMdSpi(CHessMdSpi):
 ### 新浪股票行情Gateway
 
 新浪股票（含ETF）实时行情的接口为："https://hq.sinajs.cn/list=sh510050"，返回的数据如下：
+
 ```
 var hq_str_sh510050="上证50ETF,2.687,2.703,2.677,2.699,2.661,2.676,2.677,690934326,1848751782.000,876100,2.676,
 129500,2.675,175600,2.674,491900,2.673,918000,2.672,36935,2.677,341500,2.678,493500,2.679,1324900,2.680,653400,
@@ -273,6 +276,7 @@ var hq_str_sh510050=证券简称，今日开盘价，昨日收盘价，最近成
 ```
 
 新浪股票行情Gateway类：
+
 ```python
 from requests import get
 import pandas as pd
@@ -298,10 +302,10 @@ class CSinaStockMdApi(CSinaMDApi):
             with self._value_lock:
                 url = "https://hq.sinajs.cn/list={code_str}".format(code_str=self._SubscribedCodesString)
             data = get(url, headers=SinaApiConst.HQ_REQUEST_HEADERS).content.decode('gbk')
-            # 解析返回数据中的股票代码 #
+            # 解析返回数据中的股票代码
             str_code_pattern = re.compile(r'hq_str_(.*?)=')
             stock_codes = str_code_pattern.findall(data)
-            # 解析返回数据中的行情数据 #
+            # 解析返回数据中的行情数据
             str_mkt_pattern = re.compile(r'=\"(.*?)\";')
             mkt_datas = str_mkt_pattern.findall(data)
             stock_mkt_datas = [[Utils.Symbol2MktCode(code)] + mkt_data.rstrip(',').split(',') for code,
@@ -317,6 +321,7 @@ class CSinaStockMdApi(CSinaMDApi):
 ### 新浪股指期货行情Gateway
 
 新浪股指期货实时行情接口为：”https://hq.sinajs.cn/list=CFE_RE_IH2205“，返回的数据如下：
+
 ```
 var hq_str_CFF_RE_IH2205="2700.600,2710.800,2668.000,2683.800,31848,85632757.200,38082.000,2683.800,0.000,2985.800,
 2443.000,0.000,0.000,2711.400,2714.400,40529.000,2685.800,1,0.000,0,0.000,0,0.000,0,0.000,0,2686.000,2,0.000,0,0.000,
@@ -328,6 +333,7 @@ var hq_str_CFE_RF_IH2205=开盘价，最高价，最低价，最新价，成交�
 ```
 
 新浪股指期货行情Gateway：
+
 ```python
 from requests import get
 import pandas as pd
@@ -352,10 +358,10 @@ class CSinaIdxFutureMdApi(CSinaMDApi):
             with self._value_lock:
                 url = "https://hq.sinajs.cn/list={code_str}".format(code_str=self._SubscribedCodesString)
             data = get(url, headers=SinaApiConst.HQ_REQUEST_HEADERS).content.decode("gbk")
-            # 解析返回数据中的期指代码 #
+            # 解析返回数据中的期指代码
             str_code_pattern = re.compile(r"CFF_RE_(.*?)=")
             idxFt_codes = str_code_pattern.findall(data)
-            # 解析返回数据中的行情数据 #
+            # 解析返回数据中的行情数据
             str_mkt_pattern = re.compile(r'=\"(.*?)\";')
             mkt_datas = str_mkt_pattern.findall(data)
             idxFt_mkt_datas = [[Utils.Symbol2MktCode(code)] + mkt_data.split(',')
@@ -376,6 +382,7 @@ class CSinaIdxFutureMdApi(CSinaMDApi):
 ### 新浪股票期权行情Gateway
 
 新浪股票期权实时行情接口为：“https://hq.sinajs.cn/list=CON_OP_10004163”，返回的数据如下：
+
 ```
 var hq_str_CON_OP_10004163="70,0.0421,0.0421,0.0422,1,149089,-27.29,2.7000,0.0579,0.0529,0.3282,0.0001,0.0426,82,
 0.0425,86,0.0424,33,0.0423,26,0.0422,1,0.0421,70,0.0420,33,0.0419,91,0.0418,56,0.0417,11,2022-05-09 15:00:00,0,
@@ -390,6 +397,7 @@ var hq_str_CON_OP_10004163=买量，买价，最新价，卖价，卖量，持�
 ```
 
 新浪股票期权实时隐波、希腊字母接口为：“https://hq.sinajs.cn/list=CON_SO_10004163”，返回的数据如下：
+
 ```
 var hq_str_CON_SO_10004163="50ETF购5月2700,,,,189902,0.4615,2.7049,-0.7123,0.2226,0.2261,0.0549,0.0367,
 510050C2205M02700,2.7000,0.0421,0.0501,M";
@@ -399,6 +407,7 @@ var hq_str_CON_SO_10004163=期权合约简称,,,,成交量,Delta,Gamma,Theta,Veg
 ```
 
 新浪股票期权行情Gateway：
+
 ```python
 from requests import get
 import pandas as pd
@@ -448,10 +457,10 @@ class CSinaStockOptionMdApi(CSinaMDApi):
             with self._value_lock:
                 url = "https://hq.sinajs.cn/list={code_str}".format(code_str=self._SubscribedCodesString)
             data = get(url, headers=SinaApiConst.HQ_REQUEST_HEADERS).content.decode('gbk')
-            # 解析返回数据中的期权代码 #
+            # 解析返回数据中的期权代码
             str_code_pattern = re.compile(r'OP_(.*?)=')
             opt_codes = str_code_pattern.findall(data)
-            # 解析返回数据中的行情数据 #
+            # 解析返回数据中的行情数据
             str_mkt_pattern = re.compile(r'=\"(.*?)\";')
             mkt_datas = str_mkt_pattern.findall(data)
             opt_mkt_datas = [[Utils.Symbol2MktCode(code)] + mkt_data.split(',')
