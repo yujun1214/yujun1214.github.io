@@ -170,7 +170,6 @@ class CHessTraderSpi(QObject):
     """交易spi接口"""
 
     # 定义信号
-
     sigOnRspUserLogin = Signal(CHessRspUserLoginField, CHessRspInfoField, int, bool)
     sigOnRspUserLogout = Signal(CHessUserLogoutField, CHessRspInfoField, int, bool)
     sigOnRspOrderInsert = Signal(CHessInputOrderField, CHessRspInfoField, int, bool)
@@ -193,10 +192,8 @@ class CHessTraderSpi(QObject):
                                  'SessionID', 'StatusMsg']
         # 报单簿, 类型为pd.DataFrame, index为OrderRef
         # 该报单簿维护所有本接口发出去的订单
-
         self.dfOrderBook = pd.DataFrame(columns=self.orderbook_header)
         # 佣金表, {ExchangeID_i: {SecuType_i: {'ratio': r, 'type': CHessCommissionRatioType}}}
-
         self._dictCommissionTable: dict = None
 
     @property
@@ -362,7 +359,6 @@ class CHessTraderSpi(QObject):
             self.dfOrderBook = self.dfOrderBook.append(other=new_order, ignore_index=False)
         else:
             # 正常交易、撤单成功或被交易所拒单
-
             self.dfOrderBook.loc[order_ref, 'OrderStatus'] = rtnOrder.OrderStatus
             self.dfOrderBook.loc[order_ref, 'OrderSubmitStatus'] = rtnOrder.OrderSubmitStatus
             self.dfOrderBook.loc[order_ref, 'VolumeTraded'] = rtnOrder.VolumeTraded

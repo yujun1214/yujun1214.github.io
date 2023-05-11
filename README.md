@@ -58,7 +58,7 @@ SEOTitle: 期权量化 | 区块链		    # SEO 标题
 description: "Hey"	   	   # 随便说点，描述一下
 
 # SNS settings      
-github_username: yujun1214      # 你的github账号
+github_username: github_id      # 你的github账号
 jianshu_username: jianshu_id    # 你的简书ID。
 
 # Build settings
